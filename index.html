@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trạng thái bật/tắt</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            background: linear-gradient(135deg, #1e1e2f 0%, #2a2a3b 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #fff;
+        }
+
+        .card {
+            background: rgba(30, 30, 46, 0.8);
+            backdrop-filter: blur(10px);
+            border-radius: 2rem;
+            padding: 2rem 2.5rem;
+            text-align: center;
+            box-shadow: 0 25px 45px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.05);
+            transition: all 0.3s ease;
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            font-weight: 500;
+            margin-bottom: 1rem;
+            letter-spacing: -0.5px;
+            color: #e2e2ff;
+        }
+
+        .status-icon {
+            font-size: 5rem;
+            margin: 1.5rem 0;
+            padding: 0.5rem;
+            display: inline-block;
+            border-radius: 100%;
+            transition: 0.2s;
+        }
+
+        .status-text {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .status-on {
+            color: #2ecc71;
+            text-shadow: 0 0 12px rgba(46, 204, 113, 0.5);
+        }
+
+        .status-off {
+            color: #e74c3c;
+            text-shadow: 0 0 12px rgba(231, 76, 60, 0.5);
+        }
+
+        .badge {
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 40px;
+            padding: 0.6rem 1.2rem;
+            font-size: 0.9rem;
+            font-family: monospace;
+            margin-top: 1.5rem;
+            word-break: break-all;
+        }
+
+        .hint {
+            font-size: 0.8rem;
+            opacity: 0.7;
+            margin-top: 1rem;
+        }
+
+        .btn-group {
+            margin-top: 1.8rem;
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+        }
+
+        button {
+            background: #3b3b54;
+            border: none;
+            color: white;
+            font-size: 1rem;
+            padding: 0.5rem 1.2rem;
+            border-radius: 60px;
+            cursor: pointer;
+            transition: 0.2s;
+            font-weight: 500;
+        }
+
+        button:hover {
+            background: #52527a;
+            transform: scale(1.02);
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>⚡ Bảng trạng thái</h1>
+        <div class="status-icon" id="icon">🔘</div>
+        <div class="status-text" id="statusDisplay">--</div>
+        <div class="btn-group">
+            <button onclick="setStatus('on')">BẬT ✅</button>
+            <button onclick="setStatus('off')">TẮT ❌</button>
+        </div>
+        <div class="badge" id="urlHint">
+            <!-- URL hiện tại sẽ hiển thị ở đây -->
+        </div>
+        <div class="hint">
+            💡 Dùng URL: <strong>?status=on</strong> hoặc <strong>?status=off</strong>
+        </div>
+    </div>
+
+    <script>
+        // Hàm lấy tham số trên URL
+        function getStatusFromURL() {
+            const params = new URLSearchParams(window.location.search);
+            const statusParam = params.get('status');
+            if (statusParam === 'on') return 'on';
+            if (statusParam === 'off') return 'off';
+            return null;
+        }
+
+        // Hàm cập nhật giao diện và URL (thay đổi thanh địa chỉ mà không reload)
+        function updateUIAndURL(status) {
+            const statusDisplay = document.getElementById('statusDisplay');
+            const iconEl = document.getElementById('icon');
+
+            if (status === 'on') {
+                statusDisplay.innerHTML = 'ON';
+                statusDisplay.className = 'status-text status-on';
+                iconEl.innerHTML = '🟢';
+                document.title = 'Trạng thái: ON';
+            } else if (status === 'off') {
+                statusDisplay.innerHTML = 'OFF';
+                statusDisplay.className = 'status-text status-off';
+                iconEl.innerHTML = '🔴';
+                document.title = 'Trạng thái: OFF';
+            } else {
+                statusDisplay.innerHTML = '?';
+                statusDisplay.className = 'status-text';
+                iconEl.innerHTML = '⚪';
+                document.title = 'Trạng thái không xác định';
+                return false;
+            }
+            return true;
+        }
+
+        // Hàm cập nhật URL mới (thay đổi query string)
+        function pushNewURLStatus(status) {
+            const url = new URL(window.location.href);
+            if (status === 'on') {
+                url.searchParams.set('status', 'on');
+            } else if (status === 'off') {
+                url.searchParams.set('status', 'off');
+            } else {
+                url.searchParams.delete('status');
+            }
+            window.history.pushState({}, '', url);
+            // Cập nhật lại dòng badge hiển thị URL rút gọn
+            document.getElementById('urlHint').innerHTML = `🔗 URL hiện tại: <strong>${url.pathname}?status=${status || 'không có'}</strong>`;
+        }
+
+        // Hàm chính khi bấm nút hoặc tải trang
+        function setStatus(status) {
+            if (status !== 'on' && status !== 'off') return;
+            updateUIAndURL(status);
+            pushNewURLStatus(status);
+        }
+
+        // Khởi tạo khi load trang
+        function init() {
+            let currentStatus = getStatusFromURL();
+            if (currentStatus === 'on' || currentStatus === 'off') {
+                updateUIAndURL(currentStatus);
+                pushNewURLStatus(currentStatus);
+            } else {
+                // Mặc định hiển thị trạng thái trống
+                document.getElementById('statusDisplay').innerHTML = 'Chưa đặt';
+                document.getElementById('statusDisplay').className = 'status-text';
+                document.getElementById('icon').innerHTML = '⚙️';
+                document.getElementById('urlHint').innerHTML = `🔗 URL hiện tại: <strong>${window.location.pathname}</strong> (không có ?status)`;
+            }
+        }
+
+        init();
+    </script>
+</body>
+</html>

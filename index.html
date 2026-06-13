@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý trạng thái</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 2rem;
+            padding: 2.5rem;
+            text-align: center;
+            max-width: 500px;
+            width: 100%;
+            box-shadow: 0 25px 45px rgba(0, 0, 0, 0.2);
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .status-container {
+            background: #f7f7f7;
+            border-radius: 1.5rem;
+            padding: 2rem;
+            margin: 1.5rem 0;
+        }
+
+        .status-icon {
+            font-size: 5rem;
+            margin-bottom: 1rem;
+        }
+
+        .status-text {
+            font-size: 3rem;
+            font-weight: 800;
+            text-transform: uppercase;
+        }
+
+        .status-on {
+            color: #27ae60;
+        }
+
+        .status-off {
+            color: #e74c3c;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+
+        button {
+            flex: 1;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            color: white;
+            font-size: 1.1rem;
+            font-weight: 600;
+            padding: 0.8rem;
+            border-radius: 60px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+        }
+
+        .info {
+            background: #f0f0f0;
+            border-radius: 1rem;
+            padding: 1rem;
+            font-size: 0.85rem;
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>⚡ Bảng điều khiển</h1>
+        
+        <div class="status-container">
+            <div class="status-icon" id="icon">⚪</div>
+            <div class="status-text status-off" id="statusDisplay">OFF</div>
+        </div>
+        
+        <div class="btn-group">
+            <button onclick="setStatus('ON')">🟢 BẬT</button>
+            <button onclick="setStatus('OFF')">🔴 TẮT</button>
+        </div>
+        
+        <div class="info">
+            <div>📁 Lưu trạng thái trong localStorage</div>
+            <div>🔄 Trạng thái được ghi nhớ khi refresh</div>
+        </div>
+    </div>
+
+    <script>
+        // Lưu trạng thái trong localStorage (thay thế file status.txt)
+        function getStatus() {
+            return localStorage.getItem('deviceStatus') || 'OFF';
+        }
+        
+        function saveStatus(status) {
+            localStorage.setItem('deviceStatus', status);
+        }
+        
+        function updateUI(status) {
+            const statusDisplay = document.getElementById('statusDisplay');
+            const icon = document.getElementById('icon');
+            
+            if (status === 'ON') {
+                statusDisplay.innerHTML = 'ON';
+                statusDisplay.className = 'status-text status-on';
+                icon.innerHTML = '🟢';
+                document.title = 'Trạng thái: BẬT';
+            } else {
+                statusDisplay.innerHTML = 'OFF';
+                statusDisplay.className = 'status-text status-off';
+                icon.innerHTML = '🔴';
+                document.title = 'Trạng thái: TẮT';
+            }
+        }
+        
+        function setStatus(status) {
+            saveStatus(status);
+            updateUI(status);
+        }
+        
+        // Khởi tạo
+        updateUI(getStatus());
+    </script>
+</body>
+</html>
